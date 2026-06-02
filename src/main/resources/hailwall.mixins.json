@@ -1,0 +1,11 @@
+{
+	"required": false,
+	"package": "com.hailwall.mixin",
+	"compatibilityLevel": "JAVA_25",
+	"mixins": [
+		"ServerLoginPacketListenerImplAccessor"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
