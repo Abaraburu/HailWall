@@ -1,0 +1,35 @@
+{
+	"schemaVersion": 1,
+	"id": "hailwall",
+	"version": "${version}",
+	"name": "HailWall",
+	"description": "Server-side mod whitelist/blacklist. On join it checks each player's client mods and kicks the ones that are not allowed (or that are missing a required mod). Install it on both the server and the client.",
+	"authors": [
+		"HailWall"
+	],
+	"contact": {
+		"homepage": "https://modrinth.com/mod/hailwall",
+		"sources": "https://github.com/Abaraburu/HailWall",
+		"issues": "https://github.com/Abaraburu/HailWall/issues"
+	},
+	"license": "MIT",
+	"icon": "assets/hailwall/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.hailwall.fabric.HailWallFabric"
+		],
+		"client": [
+			"com.hailwall.fabric.client.HailWallFabricClient"
+		]
+	},
+	"mixins": [
+		"hailwall.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.14",
+		"minecraft": [">=1.18", "<1.19"],
+		"java": ">=17",
+		"fabric-api": "*"
+	}
+}
