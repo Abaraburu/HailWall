@@ -1,0 +1,74 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+version = mod_version
+group = mod_group_id
+
+base {
+    archivesName = "hailwall-neoforge-${minecraft_version}"
+}
+
+// Mojang ships Java 21 to end users in 1.21.1, so mods target Java 21.
+// foojay-resolver (settings.gradle) auto-provisions a JDK 21 toolchain if absent.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+}
+
+neoForge {
+    version = project.neo_version
+
+    // Default run configurations (used only by runClient/runServer, not by 'build').
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+            programArgument '--nogui'
+        }
+    }
+
+    mods {
+        "hailwall" {
+            sourceSet(sourceSets.main)
+        }
+    }
+}
+
+// Compile the loader-agnostic shared core (single source of truth in <repo>/core).
+sourceSets.main.java.srcDir file("${rootDir}/../../../core/src/main/java")
+
+// Expand the mod version (and friends) into neoforge.mods.toml from src/main/templates.
+var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
+    var replaceProperties = [
+            minecraft_version      : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version            : neo_version,
+            loader_version_range   : loader_version_range,
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_license            : mod_license,
+            mod_version            : mod_version,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties
+    from "src/main/templates"
+    into "build/generated/sources/modMetadata"
+}
+sourceSets.main.resources.srcDir generateModMetadata
+neoForge.ideSyncTask generateModMetadata
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+jar {
+    // Final distributable jar name: hailwall_<modver>_neoforge_<mcrange>.jar
+    archiveFileName = "hailwall_${project.mod_version}_neoforge_${project.mc_range}.jar"
+    from("${rootDir}/../../../LICENSE") {
+        rename { "${it}_hailwall" }
+    }
+}
