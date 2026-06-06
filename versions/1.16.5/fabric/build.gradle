@@ -1,0 +1,73 @@
+plugins {
+	id 'fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = "hailwall-fabric-${project.minecraft_version}"
+}
+
+repositories {
+}
+
+loom {
+	mods {
+		"hailwall" {
+			sourceSet sourceSets.main
+		}
+	}
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	mappings loom.officialMojangMappings()
+
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}"
+
+	// MC < 1.17 does not ship slf4j (it uses log4j). The shared core logs via slf4j;
+	// Fabric Loader 0.15+ provides slf4j at runtime, so we only need it at compile time.
+	compileOnly "org.slf4j:slf4j-api:1.7.36"
+}
+
+// Compile the loader-agnostic shared core (single source of truth in <repo>/core).
+sourceSets {
+	main {
+		java {
+			srcDir file("${rootDir}/../../../core/src/main/java")
+		}
+	}
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+// 1.16.5 runs on Java 8.
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 8
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+	targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+jar {
+	from("${rootDir}/../../../LICENSE") {
+		rename { "${it}_hailwall" }
+	}
+}
+
+// Final distributable jar name: hailwall_<modver>_fabric_<mcrange>.jar
+remapJar {
+	archiveFileName = "hailwall_${project.mod_version}_fabric_${project.mc_range}.jar"
+}
