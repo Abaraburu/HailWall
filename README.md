@@ -2,7 +2,7 @@
 
 # HailWall
 
-**Server-side mod whitelist / blacklist for Minecraft 26.1.2 (Fabric).**
+**Server-side mod whitelist / blacklist for Minecraft (Fabric & NeoForge).**
 When a player joins, the server checks the mods on their **client** and kicks them
 if disallowed mods are present (or required mods are missing).
 
@@ -19,6 +19,26 @@ if disallowed mods are present (or required mods are missing).
 
 A modern, lightweight reimplementation of the classic **[Mod Whitelist](https://github.com/Viola-Siemens/Mod-Whitelist)**
 idea, rebuilt for the new 26.1 toolchain (Mojang mappings, Fabric Loom 1.16, Java 25).
+
+## Project structure
+
+HailWall is a multi-loader, multi-version mod. The shared logic lives **once** in `core/`; each
+target is a self-contained Gradle build under `versions/<mc-version>/<loader>/` that compiles that
+shared code against the right Minecraft / loader APIs.
+
+```
+core/                    shared mod logic (config, networking, verifier, access log)
+versions/
+  1.16.5/fabric/         Fabric — Minecraft 1.16.5   (JDK 8)
+  1.18.2/fabric/         Fabric — Minecraft 1.18.2   (JDK 17)
+  1.19.2/fabric/         Fabric — Minecraft 1.19.2   (JDK 17)
+  1.20.1/fabric/         Fabric — Minecraft 1.20.1   (JDK 17)
+  1.21.1/fabric/         Fabric — Minecraft 1.21.1   (JDK 21)
+  26.1.2/fabric/         Fabric — Minecraft 26.1.2   (JDK 25)
+  1.21.1/neoforge/       NeoForge — Minecraft 1.21.1 (JDK 21)
+modrinth/description.md  store-page text  (publishing material, not mod code)
+PUBLISHING.md            release checklist (publishing material, not mod code)
+```
 
 ## Features
 
@@ -88,26 +108,4 @@ access log (default 5-day retention). Other players can't see it. Open source, s
 
 ## Security note (honest)
 
-Like **every** client-side mod check, HailWall is not bulletproof: a determined user could decompile
-the jar, extract the HMAC secret and forge a clean mod list. The signature + challenge stops casual
-spoofing, not an expert. It works great against ordinary players and is best paired with
-`online-mode=true`. To raise the bar on your own server, change the `SECRET` constant in
-[`Signing.java`](src/main/java/com/hailwall/net/Signing.java) and rebuild.
-
-## Building from source
-
-Requires **JDK 25** (Minecraft 26.1 compiles to release 25).
-
-```bash
-# Windows (PowerShell): point JAVA_HOME at a JDK 25 first
-./gradlew build
-```
-
-The mod jar is produced at `build/libs/hailwall-<version>.jar` (ignore the `*-sources.jar`).
-Toolchain: Fabric Loom 1.16, Gradle 9.4, Fabric API `0.150.0+26.1.2`, Mojang mappings.
-
-## Credits
-
-Inspired by **[Mod Whitelist](https://modrinth.com/mod/mod-whitelist)** by
-[Viola-Siemens](https://github.com/Viola-Siemens/Mod-Whitelist) (not affiliated).
-Licensed under the **MIT License** — see [LICENSE](LICENSE).
+Like **every** client-side mod check, HailWall is not bul

@@ -19,3 +19,13 @@ bin/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code worktrees / local helper files
+.claude/
+
+# Local-only artifacts (kept on disk, not part of the repo)
+/JAR Finali/
+/banner.png
+
+# Personal publishing notes (kept locally, not published)
+/PUBLISHING.md
